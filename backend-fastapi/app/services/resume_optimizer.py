@@ -1,13 +1,16 @@
-# LLM logic for resume optimization
-
-
 import re
-import requests
 import pdfplumber
 import io
+import os
+from groq import Groq
+from dotenv import load_dotenv
+
+# Load API key from .env
+load_dotenv()
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
 
 def parse_resume_sections(resume_text):
-    # Very basic section extraction (expand as needed)
     sections = {"Experience": "", "Skills": "", "Projects": ""}
     current = None
     for line in resume_text.splitlines():
@@ -22,48 +25,48 @@ def parse_resume_sections(resume_text):
             sections[current] += line + "\n"
     return sections
 
-def create_ollama_prompt(sections, job_description):
-    prompt = (
+
+def create_prompt(sections, job_description):
+    return (
         f"Experience:\n{sections['Experience'].strip()}\n\n"
         f"Skills:\n{sections['Skills'].strip()}\n\n"
         f"Projects:\n{sections['Projects'].strip()}\n\n"
         f"Job description:\n{job_description.strip()}\n\n"
-        "Return the following:\n1. What gaps are there in the resume compared to the job description?\n"
+        "Return the following:\n"
+        "1. What gaps are there in the resume compared to the job description?\n"
         "2. How can the candidate align their resume better to the job description?\n"
     )
-    return prompt
 
 
-OLLAMA_HOST = "http://localhost:11434"  # Change if your Ollama server is remote
-OLLAMA_MODEL = "llama3"  # Change to your preferred model
-
-def ollama_response(prompt):
-    url = f"{OLLAMA_HOST}/api/generate"
-    payload = {
-        "model": OLLAMA_MODEL,
-        "prompt": prompt,
-        "stream": False
-    }
+def groq_response(prompt: str):
     try:
-        print(f"Sending prompt to Ollama: {prompt[:200]}...")
-        resp = requests.post(url, json=payload, timeout=300)
-        resp.raise_for_status()
-        data = resp.json()
-        text = data.get("response", "")
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",  # You can switch to "llama3-70b-8192" if needed
+            messages=[
+                {"role": "system", "content": "You are a helpful career assistant."},
+                {"role": "user", "content": prompt},
+            ],
+        )
+
+        text = completion.choices[0].message.content
+
+        # Extract structured info (like you were doing for Ollama)
         gaps, suggestions = [], []
         for line in text.splitlines():
             if line.strip().startswith("1."):
                 gaps.append(line.strip()[2:].strip())
             elif line.strip().startswith("2."):
                 suggestions.append(line.strip()[2:].strip())
+
         return {
             "gaps": gaps or [text],
-            "alignment_suggestions": suggestions,
+            "alignment_suggestions": suggestions or [],
             "prompt": prompt
         }
+
     except Exception as e:
-        print(f"Ollama API error: {e}")
         return {"error": str(e), "prompt": prompt}
+
 
 def extract_text_from_pdf(file_bytes):
     text = ""
@@ -72,8 +75,9 @@ def extract_text_from_pdf(file_bytes):
             text += page.extract_text() or ""
     return text
 
+
 def optimize_resume_logic(resume_content, job_description, filename=None):
-    # If filename ends with .pdf, parse as PDF
+    # PDF parsing
     if filename and filename.lower().endswith('.pdf'):
         resume_text = extract_text_from_pdf(resume_content)
     else:
@@ -81,7 +85,8 @@ def optimize_resume_logic(resume_content, job_description, filename=None):
             resume_text = resume_content.decode("utf-8")
         except Exception:
             resume_text = str(resume_content)
+
     sections = parse_resume_sections(resume_text)
-    prompt = create_ollama_prompt(sections, job_description)
-    ollama_result = ollama_response(prompt)
-    return ollama_result
+    prompt = create_prompt(sections, job_description)
+    result = groq_response(prompt)
+    return result
