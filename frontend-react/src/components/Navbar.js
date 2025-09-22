@@ -1,17 +1,17 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./Navbar.css";
+"use client"
+import { Link, useNavigate } from "react-router-dom"
+import "./Navbar.css"
 
 function Navbar() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   // Function to scroll to sections within the home page
   const scrollToSection = (id) => {
-    const section = document.getElementById(id);
+    const section = document.getElementById(id)
     if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
+      section.scrollIntoView({ behavior: "smooth" })
     }
-  };
+  }
 
   return (
     <nav className="navbar">
@@ -33,7 +33,7 @@ function Navbar() {
         </button>
       </div>
     </nav>
-  );
+  )
 }
 
-export default Navbar;
+export default Navbar
