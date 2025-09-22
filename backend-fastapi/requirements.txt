@@ -1,4 +1,10 @@
 fastapi
 uvicorn
 requests
+groq
 pdfplumber
+multipart
+python-dotenv
+pydantic
+psycopg2-binary
+supabase

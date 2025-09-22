@@ -36,9 +36,11 @@ backend-fastapi/     # FastAPI backend for resume parsing and LLM integration
   python -m uvicorn app.main:app --reload
   ```
 
-### Using LLM from groq
+### Ollama LLM
 
-- Make sure .env contains api key for groq 
+- Make sure Ollama is installed locally
+- The backend will start Ollama automatically if needed
+- Default model: llama3 (can be changed in code)
 
 ## API Example
 

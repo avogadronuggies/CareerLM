@@ -1,52 +1,55 @@
+/* ============================= */
+/* Global styles                 */
+/* ============================= */
 body {
     font-family: Arial, sans-serif;
-}
-
-.App {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 24px;
-    border-radius: 8px;
+    margin: 0;
+    padding: 0;
     background: #f9f9f9;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    /* fallback */
 }
 
-h2 {
-    color: #2d3a4b;
+/* Main app container */
+.App {
+    max-width: 1200px;
+    padding: 24px;
+    position: relative;
+    z-index: 1;
+    /* ensures content is above background */
 }
 
-form>div {
-    margin-bottom: 18px;
-}
-
-label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: bold;
-}
-
-input[type="file"] {
-    margin-top: 4px;
-}
-
-textarea {
+/* Reusable radial gradient background */
+.bg-radial-gradient {
+    position: relative;
     width: 100%;
-    font-size: 1rem;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+    min-height: 100vh;
+    /* full screen height */
+    background: radial-gradient(125% 125% at 50% 90%,
+            #fff 40%,
+            #6366f1 100%);
+    overflow: hidden;
+    /* prevents scroll issues if content slightly overflows */
+    display: flex;
+    justify-content: center;
+    /* center content horizontally */
+    padding: 20px;
+    /* optional padding for small screens */
+    box-sizing: border-box;
+    z-index: 0;
 }
 
-button {
-    background: #2d3a4b;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
+/* Ensure children inside gradient stay above background */
+.bg-radial-gradient>* {
+    position: relative;
+    z-index: 1;
 }
 
-button:hover {
-    background: #1a2230;
+/* ============================= */
+/* Responsiveness                */
+/* ============================= */
+@media (max-width: 768px) {
+    .App {
+        margin: 20px auto;
+        padding: 16px;
+    }
 }
