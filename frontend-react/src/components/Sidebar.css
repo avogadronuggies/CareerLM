@@ -1,0 +1,220 @@
+.sidebar {
+    position: fixed;
+    top: 64px;
+    /* Set this to your navbar's height */
+    left: 0;
+    width: 220px;
+    height: calc(100vh - 64px);
+    /* Adjust height to not overlap navbar */
+    background: #fff;
+    box-shadow: 2px 0 8px rgba(99, 102, 241, 0.08);
+    z-index: 10;
+    padding: 24px 0;
+}
+.sidebar-header {
+    padding: 32px 24px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: white;
+    margin-bottom: 8px;
+}
+
+.sidebar-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #6366f1;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.025em;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sidebar-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+    margin: 0;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 16px 0;
+    overflow-y: auto;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 24px;
+    margin: 0 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #475569;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 12px;
+}
+
+.menu-item:hover::before {
+    opacity: 1;
+}
+
+.menu-item:hover {
+    color: white;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.menu-item:active {
+    transform: translateX(2px) scale(0.98);
+}
+
+.menu-icon {
+    font-size: 1.125rem;
+    margin-right: 12px;
+    position: relative;
+    z-index: 1;
+    min-width: 20px;
+    text-align: center;
+}
+
+.menu-text {
+    position: relative;
+    z-index: 1;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+}
+
+.upload-item {
+    margin-top: 16px;
+    background: rgba(99, 102, 241, 0.05);
+    border: 2px dashed #6366f1;
+    color: #6366f1;
+    font-weight: 600;
+}
+
+.upload-item::before {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.upload-item:hover {
+    background: transparent;
+    border-color: transparent;
+    color: white;
+}
+
+.upload-item .menu-icon {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-3px);
+    }
+
+    60% {
+        transform: translateY(-2px);
+    }
+}
+
+/* Scrollbar styling */
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        flex-direction: row;
+        padding: 12px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+        display: none;
+    }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 0;
+    }
+
+    .sidebar-menu {
+        flex-direction: row;
+        justify-content: space-around;
+        gap: 8px;
+    }
+
+    .menu-item {
+        flex-direction: column;
+        padding: 8px 4px;
+        margin: 0;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .menu-icon {
+        margin-right: 0;
+        margin-bottom: 4px;
+    }
+
+    .menu-text {
+        font-size: 0.75rem;
+    }
+
+    .upload-item {
+        margin-top: 0;
+    }
+}
