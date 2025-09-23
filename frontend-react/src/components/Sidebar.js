@@ -1,5 +1,5 @@
-import React from "react";
-import "./Sidebar.css";
+"use client"
+import "./Sidebar.css"
 
 function Sidebar({ setCurrentPage }) {
   return (
@@ -11,10 +11,7 @@ function Sidebar({ setCurrentPage }) {
 
       <nav className="sidebar-nav">
         <ul className="sidebar-menu">
-          <li
-            className="menu-item upload-item"
-            onClick={() => setCurrentPage("upload")}
-          >
+          <li className="menu-item upload-item" onClick={() => setCurrentPage("upload")}>
             <span className="menu-icon">⬆</span>
             <span className="menu-text">Upload Resume</span>
           </li>
@@ -23,10 +20,7 @@ function Sidebar({ setCurrentPage }) {
             <span className="menu-icon">📊</span>
             <span className="menu-text">Dashboard</span>
           </li>
-          <li
-            className="menu-item"
-            onClick={() => setCurrentPage("resume_optimizer")}
-          >
+          <li className="menu-item" onClick={() => setCurrentPage("resume_optimizer")}>
             <span className="menu-icon">📄</span>
             <span className="menu-text">Resume Optimizer</span>
           </li>
@@ -34,31 +28,22 @@ function Sidebar({ setCurrentPage }) {
             <span className="menu-icon">🎯</span>
             <span className="menu-text">Skill Gap Analyzer</span>
           </li>
-          <li
-            className="menu-item"
-            onClick={() => setCurrentPage("mock_interview")}
-          >
+          <li className="menu-item" onClick={() => setCurrentPage("mock_interview")}>
             <span className="menu-icon">🎤</span>
             <span className="menu-text">Mock Interview</span>
           </li>
-          <li
-            className="menu-item"
-            onClick={() => setCurrentPage("cold_email")}
-          >
+          <li className="menu-item" onClick={() => setCurrentPage("cold_email")}>
             <span className="menu-icon">✉</span>
             <span className="menu-text">Cold Email Generator</span>
           </li>
-          <li
-            className="menu-item"
-            onClick={() => setCurrentPage("study_planner")}
-          >
+          <li className="menu-item" onClick={() => setCurrentPage("study_planner")}>
             <span className="menu-icon">📚</span>
             <span className="menu-text">Study Planner</span>
           </li>
         </ul>
       </nav>
     </div>
-  );
+  )
 }
 
-export default Sidebar;
+export default Sidebar
