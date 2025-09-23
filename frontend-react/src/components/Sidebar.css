@@ -1,11 +1,11 @@
 .sidebar {
     position: fixed;
-    top: 0;
+    top: 64px; /* Added top offset to account for navbar height */
     left: 0;
     width: 320px; /* Increased from 280px to 320px for full text visibility */
     bottom: 0;
-    height: 100vh;
-    min-height: 100vh;
+    height: calc(100vh - 64px); /* Adjusted height to account for navbar */
+    min-height: calc(100vh - 64px); /* Adjusted min-height to account for navbar */
     background: #fff;
     box-shadow: 2px 0 8px rgba(99, 102, 241, 0.08);
     z-index: 10;
