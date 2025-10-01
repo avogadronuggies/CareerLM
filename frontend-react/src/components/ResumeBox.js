@@ -1,4 +1,5 @@
 import "./ResumeBox.css";
+import ATSScore from "./ATSScore";
 
 function ResultBox({ result }) {
   if (!result) return null;
@@ -52,6 +53,18 @@ function ResultBox({ result }) {
               </div>
             </div>
 
+            {/* ATS Score Component */}
+            {result.ats_score && (
+              <div className="ats-score-wrapper">
+                <ATSScore 
+                  score={result.ats_score} 
+                  componentScores={result.ats_analysis?.component_scores} 
+                  justification={result.ats_analysis?.justification}
+                  aiAnalysis={result.ats_analysis?.ai_analysis}
+                />
+              </div>
+            )}
+            
             <div className="results-grid">
               <div className="result-section gaps-section">
                 <div className="section-header">

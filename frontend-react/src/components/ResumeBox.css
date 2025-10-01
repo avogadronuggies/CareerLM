@@ -99,8 +99,50 @@
     font-weight: 500;
   }
   
-  /* Enhanced success header with better visual hierarchy */
-  .result-header {
+/* Enhanced success header with better visual hierarchy */
+.result-header {
+
+}
+
+/* ATS Score Wrapper */
+.ats-score-wrapper {
+    margin-top: 16px;
+    margin-bottom: 28px;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Results Grid */
+.results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Result Sections */
+.result-section {
+    background: #fafafa;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.result-section:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.section-header {
+
     display: flex;
     align-items: center;
     gap: 24px;

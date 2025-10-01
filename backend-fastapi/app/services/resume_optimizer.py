@@ -4,6 +4,7 @@ import io
 import os
 from groq import Groq
 from dotenv import load_dotenv
+from app.services.ats_checker import get_ats_score
 
 # Load API key from .env
 load_dotenv()
@@ -33,8 +34,10 @@ def create_prompt(sections, job_description):
         f"Projects:\n{sections['Projects'].strip()}\n\n"
         f"Job description:\n{job_description.strip()}\n\n"
         "Return the following:\n"
-        "1. What gaps are there in the resume compared to the job description?\n"
+        "1. What gaps are there in the resume compared to the job description? \n"
+        "Don't overthink and just return the gaps you find.\n"
         "2. How can the candidate align their resume better to the job description?\n"
+        
     )
 
 
@@ -88,5 +91,19 @@ def optimize_resume_logic(resume_content, job_description, filename=None):
 
     sections = parse_resume_sections(resume_text)
     prompt = create_prompt(sections, job_description)
+    
+    # Get optimization suggestions from LLM
     result = groq_response(prompt)
+    
+    # Get ATS score and analysis
+    ats_analysis = get_ats_score(resume_content, job_description, filename)
+    
+    # Add ATS score to result
+    result["ats_score"] = ats_analysis["overall_score"]
+    result["ats_analysis"] = {
+        "component_scores": ats_analysis["component_scores"],
+        "justification": ats_analysis["justification"],
+        "ai_analysis": ats_analysis["ai_analysis"]
+    }
+    
     return result

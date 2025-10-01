@@ -49,12 +49,15 @@ function ResumeUpload({ onResult }) {
       const data = await response.json();
 
       // Extract analysis for ResultBox
-      const analysis = data.optimization?.analysis || {};
+      const optimization = data.optimization || {};
+      const analysis = optimization.analysis || {};
 
       setResult({
         gaps: analysis.gaps || [],
         alignment_suggestions: analysis.alignment_suggestions || [],
         error: analysis.error || null,
+        ats_score: optimization.ats_score,
+        ats_analysis: optimization.ats_analysis || {},
       });
     } catch (err) {
       setError("Failed to fetch response from backend.");

@@ -70,7 +70,8 @@ async def optimize_resume(
             "alignment_suggestions": analysis_result.get("alignment_suggestions", []),
             "prompt": analysis_result.get("prompt", "")
         },
-        "ats_score": None,
+        "ats_score": analysis_result.get("ats_score"),
+        "ats_analysis": analysis_result.get("ats_analysis", {}),
         "summary": "",
         "filename": resume.filename,
     }
