@@ -56,18 +56,19 @@ function ResultBox({ result }) {
             {/* ATS Score Component */}
             {result.ats_score && (
               <div className="ats-score-wrapper">
-                <ATSScore 
-                  score={result.ats_score} 
-                  componentScores={result.ats_analysis?.component_scores} 
+                <ATSScore
+                  score={result.ats_score}
+                  componentScores={result.ats_analysis?.component_scores}
                   justification={result.ats_analysis?.justification}
                   aiAnalysis={result.ats_analysis?.ai_analysis}
                 />
               </div>
             )}
-            
-            <div className="results-grid">
-              <div className="result-section gaps-section">
-                <div className="section-header">
+
+            <div className="results-compact">
+              {/* Identified Gaps - Row Layout */}
+              <div className="result-section-compact gaps-section">
+                <div className="section-header-compact">
                   <div className="section-icon-wrapper warning">
                     <svg
                       className="section-icon"
@@ -83,48 +84,31 @@ function ResultBox({ result }) {
                       />
                     </svg>
                   </div>
-                  <div className="section-title">
-                    <h4>Identified Gaps</h4>
-                    <span className="count-badge gaps-badge">
-                      {result.gaps?.length || 0}
-                    </span>
-                  </div>
+                  <h4>Identified Gaps</h4>
+                  <span className="count-badge gaps-badge">
+                    {result.gaps?.length || 0}
+                  </span>
                 </div>
-                <div className="section-content">
-                  <ul className="result-list">
-                    {result.gaps && result.gaps.length > 0 ? (
-                      result.gaps.map((gap, idx) => (
-                        <li key={idx} className="result-item gap-item">
-                          <div className="item-indicator gap-indicator"></div>
-                          <span className="item-text">{gap}</span>
-                        </li>
-                      ))
-                    ) : (
-                      <li className="result-item no-items success-item">
-                        <div className="check-icon-wrapper">
-                          <svg
-                            className="check-icon"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                        <span className="item-text">
-                          No gaps identified - Great job!
+                <div className="section-content-compact">
+                  {result.gaps && result.gaps.length > 0 ? (
+                    <div className="items-row">
+                      {result.gaps.map((gap, idx) => (
+                        <span key={idx} className="item-chip gap-chip">
+                          {gap}
                         </span>
-                      </li>
-                    )}
-                  </ul>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="no-items-compact success-message">
+                      <span>✓ No gaps identified - Great job!</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="result-section suggestions-section">
-                <div className="section-header">
+              {/* Alignment Suggestions - Row Layout */}
+              <div className="result-section-compact suggestions-section">
+                <div className="section-header-compact">
                   <div className="section-icon-wrapper info">
                     <svg
                       className="section-icon"
@@ -140,44 +124,26 @@ function ResultBox({ result }) {
                       />
                     </svg>
                   </div>
-                  <div className="section-title">
-                    <h4>Alignment Suggestions</h4>
-                    <span className="count-badge suggestions-badge">
-                      {result.alignment_suggestions?.length || 0}
-                    </span>
-                  </div>
+                  <h4>Alignment Suggestions</h4>
+                  <span className="count-badge suggestions-badge">
+                    {result.alignment_suggestions?.length || 0}
+                  </span>
                 </div>
-                <div className="section-content">
-                  <ul className="result-list">
-                    {result.alignment_suggestions &&
-                    result.alignment_suggestions.length > 0 ? (
-                      result.alignment_suggestions.map((suggestion, idx) => (
-                        <li key={idx} className="result-item suggestion-item">
-                          <div className="item-indicator suggestion-indicator"></div>
-                          <span className="item-text">{suggestion}</span>
-                        </li>
-                      ))
-                    ) : (
-                      <li className="result-item no-items success-item">
-                        <div className="check-icon-wrapper">
-                          <svg
-                            className="check-icon"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                        <span className="item-text">
-                          Perfect alignment - No changes needed!
+                <div className="section-content-compact">
+                  {result.alignment_suggestions &&
+                  result.alignment_suggestions.length > 0 ? (
+                    <div className="items-row">
+                      {result.alignment_suggestions.map((suggestion, idx) => (
+                        <span key={idx} className="item-chip suggestion-chip">
+                          {suggestion}
                         </span>
-                      </li>
-                    )}
-                  </ul>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="no-items-compact success-message">
+                      <span>✓ Perfect alignment - No changes needed!</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
