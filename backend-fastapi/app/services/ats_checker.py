@@ -338,16 +338,36 @@ def get_ats_score_components(resume_bytes, job_description, filename=None):
         "ai_analysis": ai_analysis
     }
 
+def sanitize_resume_for_ai(resume_text):
+    """Remove sensitive personal information from resume before sending to AI"""
+    
+    # Parse resume into sections
+    sections = parse_resume_sections(resume_text)
+    
+    # Exclude Contact and Summary sections for privacy
+    safe_sections = []
+    for section_name, section_content in sections.items():
+        if section_name not in ["Contact", "Summary"] and section_content.strip():
+            safe_sections.append(f"[{section_name}]\n{section_content}")
+    
+    # Join the safe sections
+    sanitized_text = "\n\n".join(safe_sections)
+    
+    return sanitized_text
+
 def generate_ats_feedback(resume_text, job_description, overall_score):
     """Generate detailed AI feedback on the resume's ATS-friendliness"""
+    
+    # Sanitize resume to remove contact info and summary
+    safe_resume_text = sanitize_resume_for_ai(resume_text)
     
     prompt = f"""
     You are an expert ATS (Applicant Tracking System) analyst.
     
-    Below is a resume and a job description. The resume has received an ATS score of {overall_score}/100.
+    Below is a resume (with personal contact information removed for privacy) and a job description. The resume has received an ATS score of {overall_score}/100.
     
     Resume:
-    {resume_text[:3000]}  # Limiting length to avoid token limits
+    {safe_resume_text[:3000]}  # Limiting length to avoid token limits
     
     Job Description:
     {job_description[:1000]}
