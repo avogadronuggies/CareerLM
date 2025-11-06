@@ -1,6 +1,7 @@
 // src/components/StudyPlanner.js
 import React, { useState, useEffect } from "react";
 import "./StudyPlanner.css";
+import { formatText } from "../utils/textFormatter";
 
 function StudyPlanner({ resumeData }) {
   const [studyMaterials, setStudyMaterials] = useState(null);
@@ -137,7 +138,9 @@ function StudyPlanner({ resumeData }) {
             <div className="overview-content">
               <h3>Complete Study Plan</h3>
               <div className="study-plan-text">
-                <pre>{study_plan}</pre>
+                <div
+                  dangerouslySetInnerHTML={{ __html: formatText(study_plan) }}
+                />
               </div>
             </div>
           )}
@@ -152,16 +155,15 @@ function StudyPlanner({ resumeData }) {
               {learning_resources && learning_resources.length > 0 ? (
                 <div className="resources-list">
                   {learning_resources.map((resource, idx) => {
-                    // Clean up markdown formatting
-                    const cleanResource = resource
-                      .replace(/\*\*/g, "")
-                      .replace(/\*/g, "")
-                      .trim();
                     return (
                       <div key={idx} className="resource-card">
                         <div className="resource-number">{idx + 1}</div>
                         <div className="resource-content">
-                          <p>{cleanResource}</p>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: formatText(resource),
+                            }}
+                          />
                         </div>
                       </div>
                     );
@@ -183,16 +185,15 @@ function StudyPlanner({ resumeData }) {
               {recommended_courses && recommended_courses.length > 0 ? (
                 <div className="courses-list">
                   {recommended_courses.map((course, idx) => {
-                    // Clean up markdown formatting
-                    const cleanCourse = course
-                      .replace(/\*\*/g, "")
-                      .replace(/\*/g, "")
-                      .trim();
                     return (
                       <div key={idx} className="course-card">
                         <div className="course-badge">{idx + 1}</div>
                         <div className="course-details">
-                          <h4>{cleanCourse}</h4>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: formatText(course),
+                            }}
+                          />
                         </div>
                       </div>
                     );
@@ -216,16 +217,15 @@ function StudyPlanner({ resumeData }) {
               {practice_projects && practice_projects.length > 0 ? (
                 <div className="projects-list">
                   {practice_projects.map((project, idx) => {
-                    // Clean up markdown formatting
-                    const cleanProject = project
-                      .replace(/\*\*/g, "")
-                      .replace(/\*/g, "")
-                      .trim();
                     return (
                       <div key={idx} className="project-card">
                         <div className="project-details">
                           <h4>Project {idx + 1}</h4>
-                          <p>{cleanProject}</p>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: formatText(project),
+                            }}
+                          />
                         </div>
                       </div>
                     );
@@ -247,11 +247,6 @@ function StudyPlanner({ resumeData }) {
               {certifications && certifications.length > 0 ? (
                 <div className="certs-list">
                   {certifications.map((cert, idx) => {
-                    // Clean up markdown formatting
-                    const cleanCert = cert
-                      .replace(/\*\*/g, "")
-                      .replace(/\*/g, "")
-                      .trim();
                     return (
                       <div key={idx} className="cert-card">
                         <div className="cert-badge">
@@ -260,7 +255,11 @@ function StudyPlanner({ resumeData }) {
                           </svg>
                         </div>
                         <div className="cert-details">
-                          <h4>{cleanCert}</h4>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: formatText(cert),
+                            }}
+                          />
                         </div>
                       </div>
                     );
@@ -281,7 +280,9 @@ function StudyPlanner({ resumeData }) {
               <p className="tab-subtitle">Your roadmap to success</p>
               {timeline ? (
                 <div className="timeline-display">
-                  <pre>{timeline}</pre>
+                  <div
+                    dangerouslySetInnerHTML={{ __html: formatText(timeline) }}
+                  />
                 </div>
               ) : (
                 <p className="empty-message">No timeline available</p>

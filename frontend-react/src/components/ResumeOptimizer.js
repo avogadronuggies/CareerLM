@@ -2,6 +2,7 @@
 import React from "react";
 import ATSScore from "./ATSScore";
 import "./ResumeBox.css";
+import { formatText } from "../utils/textFormatter";
 
 function ResumeOptimizer({ resumeData }) {
   if (!resumeData) {
@@ -130,9 +131,13 @@ function ResumeOptimizer({ resumeData }) {
                     <div className="items-row">
                       {resumeData.gaps.map((gap, idx) => {
                         return (
-                          <span key={idx} className="item-chip gap-chip">
-                            {gap}
-                          </span>
+                          <span
+                            key={idx}
+                            className="item-chip gap-chip"
+                            dangerouslySetInnerHTML={{
+                              __html: formatText(gap),
+                            }}
+                          />
                         );
                       })}
                     </div>
@@ -192,9 +197,10 @@ function ResumeOptimizer({ resumeData }) {
                             <span
                               key={idx}
                               className="item-chip suggestion-chip"
-                            >
-                              {suggestion}
-                            </span>
+                              dangerouslySetInnerHTML={{
+                                __html: formatText(suggestion),
+                              }}
+                            />
                           );
                         }
                       )}

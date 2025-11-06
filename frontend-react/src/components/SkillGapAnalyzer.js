@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./SkillGapAnalyzer.css";
+import { cleanMarkdown } from "../utils/textFormatter";
 
 function SkillGapAnalyzer({ resumeData }) {
   const [resumeFile, setResumeFile] = useState(null);
@@ -230,14 +231,9 @@ function SkillGapAnalyzer({ resumeData }) {
                 <h3>Your Detected Skills</h3>
                 <div className="skills-tags">
                   {analysisResult.user_skills.map((skill, idx) => {
-                    // Clean up markdown formatting
-                    const cleanSkill = skill
-                      .replace(/\*\*/g, "")
-                      .replace(/\*/g, "")
-                      .trim();
                     return (
                       <span key={idx} className="skill-tag">
-                        {cleanSkill}
+                        {cleanMarkdown(skill)}
                       </span>
                     );
                   })}
@@ -331,14 +327,9 @@ function SkillGapAnalyzer({ resumeData }) {
                     {selectedCareer?.matched_skills &&
                     selectedCareer.matched_skills.length > 0 ? (
                       selectedCareer.matched_skills.map((skill, idx) => {
-                        // Clean up markdown formatting
-                        const cleanSkill = skill
-                          .replace(/\*\*/g, "")
-                          .replace(/\*/g, "")
-                          .trim();
                         return (
                           <span key={idx} className="skill-badge matched">
-                            {cleanSkill}
+                            {cleanMarkdown(skill)}
                           </span>
                         );
                       })
@@ -360,14 +351,9 @@ function SkillGapAnalyzer({ resumeData }) {
                     {selectedCareer?.missing_skills &&
                     selectedCareer.missing_skills.length > 0 ? (
                       selectedCareer.missing_skills.map((skill, idx) => {
-                        // Clean up markdown formatting
-                        const cleanSkill = skill
-                          .replace(/\*\*/g, "")
-                          .replace(/\*/g, "")
-                          .trim();
                         return (
                           <span key={idx} className="skill-badge missing">
-                            {cleanSkill}
+                            {cleanMarkdown(skill)}
                           </span>
                         );
                       })

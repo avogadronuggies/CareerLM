@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./ATSScore.css";
+import { formatAIAnalysis } from "../utils/textFormatter";
 
 const ATSScore = ({ score, componentScores, justification, aiAnalysis }) => {
   // State for expand/collapse
@@ -24,113 +25,25 @@ const ATSScore = ({ score, componentScores, justification, aiAnalysis }) => {
     return "#FFFFFF"; // White text for better visibility on colored backgrounds
   };
 
-  // Format AI analysis to display full content with detailed suggestions
-  const formatAIAnalysis = (analysis) => {
-    if (!analysis) return null;
+  // Format formatted suggestions for display
+  const renderFormattedSuggestions = (analysis) => {
+    const formatted = formatAIAnalysis(analysis);
 
-    // Make sure analysis is a string
-    const analysisText =
-      typeof analysis === "string" ? analysis : JSON.stringify(analysis);
+    if (!formatted) return null;
 
-    // Extract numbered points and their descriptions
-    const fullSuggestionRegex =
-      /(\d+\.\s+\*\*([^*]+)\*\*)([\s\S]*?)(?=\d+\.|$)/g;
-    let fullMatches = [...analysisText.matchAll(fullSuggestionRegex)];
-
-    if (fullMatches.length > 0) {
-      return (
-        <ul className="ai-suggestions-list">
-          {fullMatches.map((match, index) => {
-            const fullPoint = match[0].trim();
-            const title = match[2].trim();
-            // Get the description text that follows the title
-            const description = fullPoint
-              .substring(fullPoint.indexOf(title) + title.length)
-              .trim();
-
-            return (
-              <li key={index} className="ai-suggestion-item">
-                <span className="ai-suggestion-bullet">•</span>
-                <div className="ai-suggestion-content">
-                  <strong>{title}:</strong>
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: description.replace(
-                        /\*\*(.+?)\*\*/g,
-                        "<strong>$1</strong>"
-                      ),
-                    }}
-                  />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      );
-    } else {
-      // Fallback to the old numbered list extraction if the full suggestion regex doesn't match
-      const numberedListRegex = /^\d+\.\s+(.+)$/gm;
-      let matches = [...analysisText.matchAll(numberedListRegex)];
-
-      if (matches.length > 0) {
-        return (
-          <ul className="ai-suggestions-list">
-            {matches.map((match, index) => {
-              // Get the text after the number
-              const point = match[1];
-
-              // Extract any text between asterisks for emphasis
-              const formattedPoint = point.replace(
-                /\*\*(.+?)\*\*/g,
-                (_, p1) => {
-                  return `<strong>${p1}</strong>`;
-                }
-              );
-
-              return (
-                <li key={index} className="ai-suggestion-item">
-                  <span className="ai-suggestion-bullet">•</span>
-                  <span dangerouslySetInnerHTML={{ __html: formattedPoint }} />
-                </li>
-              );
-            })}
-          </ul>
-        );
-      } else {
-        // If it's not in numbered list format, format the entire text with paragraph breaks
-        const paragraphs = analysisText
-          .split("\n\n")
-          .filter((p) => p.trim().length > 0);
-
-        if (paragraphs.length > 0) {
-          return (
-            <div className="ai-analysis-paragraphs">
-              {paragraphs.map((paragraph, index) => {
-                // Format **bold text** as HTML
-                const formattedParagraph = paragraph.replace(
-                  /\*\*(.+?)\*\*/g,
-                  "<strong>$1</strong>"
-                );
-
-                return (
-                  <p
-                    key={index}
-                    dangerouslySetInnerHTML={{ __html: formattedParagraph }}
-                  />
-                );
-              })}
+    return (
+      <ul className="ai-suggestions-list">
+        {formatted.map((item, index) => (
+          <li key={index} className="ai-suggestion-item">
+            <span className="ai-suggestion-bullet">•</span>
+            <div className="ai-suggestion-content">
+              {item.title && <strong>{item.title}:</strong>}
+              <span dangerouslySetInnerHTML={{ __html: item.description }} />
             </div>
-          );
-        } else {
-          // If no paragraphs, just format and display the whole text
-          const formattedText = analysisText.replace(
-            /\*\*(.+?)\*\*/g,
-            "<strong>$1</strong>"
-          );
-          return <p dangerouslySetInnerHTML={{ __html: formattedText }} />;
-        }
-      }
-    }
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   // Format component score percentages
@@ -269,7 +182,7 @@ const ATSScore = ({ score, componentScores, justification, aiAnalysis }) => {
         {isExpanded && (
           <div className="ai-analysis-content">
             {aiAnalysis ? (
-              <div>{formatAIAnalysis(aiAnalysis)}</div>
+              renderFormattedSuggestions(aiAnalysis)
             ) : (
               <p>No AI analysis available</p>
             )}
