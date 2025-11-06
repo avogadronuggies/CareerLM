@@ -1,6 +1,6 @@
 .auth-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -38,7 +38,7 @@
     font-weight: 700;
     color: #1f2937;
     margin: 0 0 8px 0;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -73,8 +73,8 @@
   
   .auth-input:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     transform: translateY(-2px);
   }
   
@@ -85,7 +85,7 @@
   .auth-button {
     width: 100%;
     padding: 16px 24px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
     border: none;
     border-radius: 12px;
@@ -93,12 +93,12 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
   }
   
   .auth-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
     background: linear-gradient(135deg, #5b5ff1, #7c3aed);
   }
   
@@ -121,7 +121,7 @@
   .toggle-button {
     background: none;
     border: none;
-    color: #6366f1;
+    color: #3b82f6;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
@@ -133,7 +133,7 @@
   
   .toggle-button:hover {
     color: #5b5ff1;
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(59, 130, 246, 0.1);
     text-decoration: none;
   }
   
@@ -173,3 +173,7 @@
   .auth-card {
     animation: fadeInUp 0.6s ease-out;
   }
+
+
+
+

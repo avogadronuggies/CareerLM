@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.v1 import routes_resume
+from app.api.v1 import routes_resume, routes_user
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -16,6 +16,9 @@ app.add_middleware(
 
 # Include Resume Optimizer routes
 app.include_router(routes_resume.router, prefix="/api/v1/resume", tags=["Resume"])
+
+# Include User routes
+app.include_router(routes_user.router, prefix="/api/v1/user", tags=["User"])
 
 @app.get("/")
 async def root():

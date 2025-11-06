@@ -5,6 +5,7 @@ from datetime import datetime
 from fastapi import APIRouter, UploadFile, File, Form
 from fastapi.responses import JSONResponse
 from app.services.resume_optimizer import optimize_resume_logic
+from app.services.skill_gap_analyzer import analyze_skill_gap
 from supabase_client import supabase
 import re
 
@@ -60,8 +61,9 @@ async def optimize_resume(
 
     # 3️⃣ Run optimizer logic
     analysis_result = optimize_resume_logic(resume_bytes, job_description, filename=resume.filename)
-
-    analysis_result = optimize_resume_logic(resume_bytes, job_description, filename=resume.filename)
+    
+    # 3.5️⃣ Run skill gap analysis
+    skill_gap_result = analyze_skill_gap(resume_bytes, filename=resume.filename)
 
     result = {
         "sections": sections,
@@ -72,6 +74,14 @@ async def optimize_resume(
         },
         "ats_score": analysis_result.get("ats_score"),
         "ats_analysis": analysis_result.get("ats_analysis", {}),
+        "careerAnalysis": {
+            "user_skills": skill_gap_result.get("user_skills", []),
+            "total_skills_found": skill_gap_result.get("total_skills_found", 0),
+            "career_matches": skill_gap_result.get("career_matches", []),
+            "top_3_careers": skill_gap_result.get("top_3_careers", []),
+            "ai_recommendations": skill_gap_result.get("ai_recommendations", ""),
+            "analysis_summary": skill_gap_result.get("analysis_summary", {})
+        } if "error" not in skill_gap_result else None,
         "summary": "",
         "filename": resume.filename,
     }
@@ -114,3 +124,104 @@ async def optimize_resume(
         "resume_id": resume_id,
         "version_stored": stored_version.data
     })
+
+
+@router.post("/skill-gap-analysis")
+async def skill_gap_analysis(resume: UploadFile = File(...)):
+    """
+    Analyze career matches based on skills clustering.
+    Returns probability-based career recommendations and skill gaps for each career.
+    """
+    try:
+        # Read resume file
+        resume_bytes = await resume.read()
+        
+        # Import the new function
+        from app.services.skill_gap_analyzer import analyze_skill_gap
+        
+        # Perform career clustering analysis
+        analysis_result = analyze_skill_gap(resume_bytes, filename=resume.filename)
+        
+        # Check for errors
+        if "error" in analysis_result:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "success": False,
+                    "error": analysis_result["error"]
+                }
+            )
+        
+        return JSONResponse({
+            "success": True,
+            "filename": resume.filename,
+            "user_skills": analysis_result["user_skills"],
+            "total_skills_found": analysis_result["total_skills_found"],
+            "career_matches": analysis_result["career_matches"],
+            "top_3_careers": analysis_result["top_3_careers"],
+            "ai_recommendations": analysis_result["ai_recommendations"],
+            "analysis_summary": analysis_result["analysis_summary"]
+        })
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "error": str(e),
+                "message": "Failed to analyze career matches"
+            }
+        )
+
+
+@router.post("/generate-study-materials")
+async def generate_study_materials(
+    resume: UploadFile = File(...),
+    job_description: str = Form(...),
+    target_career: str = Form(None),
+    missing_skills: str = Form(None)
+):
+    """
+    Generate personalized study materials and learning resources based on skill gaps.
+    """
+    try:
+        # Read resume file
+        resume_bytes = await resume.read()
+        
+        # Import the function
+        from app.services.study_materials_generator import generate_learning_resources
+        
+        # Parse missing skills if provided
+        import json
+        skills_list = json.loads(missing_skills) if missing_skills else []
+        
+        # Generate study materials
+        study_result = generate_learning_resources(
+            resume_bytes,
+            job_description,
+            filename=resume.filename,
+            target_career=target_career,
+            missing_skills=skills_list
+        )
+        
+        return JSONResponse({
+            "success": True,
+            "filename": resume.filename,
+            "target_career": target_career,
+            "learning_resources": study_result.get("learning_resources", []),
+            "study_plan": study_result.get("study_plan", ""),
+            "recommended_courses": study_result.get("recommended_courses", []),
+            "practice_projects": study_result.get("practice_projects", []),
+            "certifications": study_result.get("certifications", []),
+            "timeline": study_result.get("timeline", "")
+        })
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "success": False,
+                "error": str(e),
+                "message": "Failed to generate study materials"
+            }
+        )

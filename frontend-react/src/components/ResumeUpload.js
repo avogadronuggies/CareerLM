@@ -42,25 +42,82 @@ function ResumeUpload({ onResult }) {
     formData.append("job_description", jobDescription);
 
     try {
-      const response = await fetch(
+      // Step 1: Resume Optimization
+      const optimizeResponse = await fetch(
         "http://localhost:8000/api/v1/resume/optimize",
         { method: "POST", body: formData }
       );
-      const data = await response.json();
+      const optimizeData = await optimizeResponse.json();
+
+      // Step 2: Career & Skill Gap Analysis
+      const skillFormData = new FormData();
+      skillFormData.append("resume", resumeFile);
+
+      const skillGapResponse = await fetch(
+        "http://localhost:8000/api/v1/resume/skill-gap-analysis",
+        { method: "POST", body: skillFormData }
+      );
+      const skillGapData = await skillGapResponse.json();
+
+      // Step 3: Generate Study Materials
+      const studyFormData = new FormData();
+      studyFormData.append("resume", resumeFile);
+      studyFormData.append("job_description", jobDescription);
+      if (skillGapData.top_3_careers && skillGapData.top_3_careers.length > 0) {
+        studyFormData.append(
+          "target_career",
+          skillGapData.top_3_careers[0].career
+        );
+        studyFormData.append(
+          "missing_skills",
+          JSON.stringify(
+            skillGapData.top_3_careers[0].missing_skills.slice(0, 5)
+          )
+        );
+      }
+
+      const studyResponse = await fetch(
+        "http://localhost:8000/api/v1/resume/generate-study-materials",
+        { method: "POST", body: studyFormData }
+      );
+      const studyData = await studyResponse.json();
 
       // Extract analysis for ResultBox
-      const optimization = data.optimization || {};
+      const optimization = optimizeData.optimization || {};
       const analysis = optimization.analysis || {};
 
-      setResult({
+      const completeResult = {
+        // Resume Optimization
         gaps: analysis.gaps || [],
         alignment_suggestions: analysis.alignment_suggestions || [],
         error: analysis.error || null,
         ats_score: optimization.ats_score,
         ats_analysis: optimization.ats_analysis || {},
-      });
+
+        // Career & Skill Gap Analysis
+        careerAnalysis: skillGapData.success ? skillGapData : null,
+
+        // Study Materials
+        studyMaterials: studyData.success ? studyData : null,
+
+        // Original data
+        filename: resumeFile.name,
+        file: resumeFile,
+        jobDescription: jobDescription,
+      };
+
+      setResult(completeResult);
+
+      // Pass complete result to parent Dashboard
+      if (onResult) {
+        onResult(completeResult);
+      }
+
+      // History is automatically saved in resume_versions table by the backend
+      // No need for separate history save call
     } catch (err) {
-      setError("Failed to fetch response from backend.");
+      console.error("Error during analysis:", err);
+      setError("Failed to complete analysis. Please try again.");
     } finally {
       setLoading(false);
     }

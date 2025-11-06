@@ -24,7 +24,7 @@ body {
     background: radial-gradient(
       125% 125% at 50% 90%,
       #fff 40%,
-      #6366f1 100%
+      #3b82f6 100%
     );
     overflow: hidden; /* prevents scroll issues if content slightly overflows */
     display: flex;
@@ -47,3 +47,7 @@ body {
       padding: 16px;
     }
   }
+
+
+
+

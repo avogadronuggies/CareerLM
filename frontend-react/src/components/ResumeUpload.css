@@ -6,7 +6,7 @@
 
 .resume-upload {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  max-width: 900px;
+  width: 100%;
   margin: 0 auto;
   padding: 32px 24px;
   /* Enhanced light gradient background with softer colors */
@@ -45,7 +45,7 @@
     0 0 0 1px rgba(255, 255, 255, 0.8),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   width: 100%;
-  max-width: 700px;
+  max-width: 100%;
   position: relative;
   overflow: hidden;
   z-index: 1;
@@ -61,18 +61,18 @@
   left: 0;
   right: 0;
   height: 4px;
-  /* Refined gradient colors */
-  background: linear-gradient(90deg, #667eea, #764ba2, #8b5fbf, #667eea);
   background-size: 300% 100%;
   animation: gradient 6s ease infinite;
   border-radius: 32px 32px 0 0;
 }
 
 @keyframes gradient {
+
   0%,
   100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
@@ -88,15 +88,14 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   /* Enhanced shadow with multiple layers */
-  box-shadow: 0 16px 40px rgba(102, 126, 234, 0.3), 0 8px 16px rgba(118, 75, 162, 0.2), 0 0 0 1px
-    rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 16px 40px rgba(102, 126, 234, 0.3), 0 8px 16px rgba(118, 75, 162, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   position: relative;
   overflow: hidden;
 }
@@ -124,7 +123,7 @@
   font-weight: 800;
   color: #1a202c;
   margin: 0 0 20px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -215,12 +214,11 @@
 }
 
 .file-input-label:hover {
-  border-color: #667eea;
+  border-color: #3b82f6;
   background: linear-gradient(135deg, #f0f4ff 0%, #e8f2ff 100%);
   transform: translateY(-4px);
   /* Enhanced hover shadow */
-  box-shadow: 0 16px 40px rgba(102, 126, 234, 0.15), 0 8px 16px rgba(118, 75, 162, 0.1), 0 0 0 1px
-    rgba(102, 126, 234, 0.15);
+  box-shadow: 0 16px 40px rgba(102, 126, 234, 0.15), 0 8px 16px rgba(118, 75, 162, 0.1), 0 0 0 1px rgba(102, 126, 234, 0.15);
 }
 
 .file-input-label:hover::before {
@@ -238,7 +236,7 @@
 .upload-icon {
   width: 64px;
   height: 64px;
-  color: #667eea;
+  color: #3b82f6;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -290,11 +288,10 @@
 
 .job-description-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3b82f6;
   background: linear-gradient(135deg, #f0f4ff 0%, #e8f2ff 100%);
   /* Enhanced focus shadow */
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), 0 8px 24px rgba(102, 126, 234, 0.1), 0 4px 12px
-    rgba(118, 75, 162, 0.08);
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), 0 8px 24px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(118, 75, 162, 0.08);
   transform: translateY(-2px);
 }
 
@@ -327,7 +324,7 @@
 
 /* Enhanced submit button with better states */
 .submit-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
   padding: 24px 44px;
@@ -344,8 +341,7 @@
   position: relative;
   overflow: hidden;
   /* Enhanced button shadow */
-  box-shadow: 0 16px 40px rgba(102, 126, 234, 0.3), 0 8px 16px rgba(118, 75, 162, 0.2), 0 0 0 1px
-    rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 16px 40px rgba(102, 126, 234, 0.3), 0 8px 16px rgba(118, 75, 162, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   letter-spacing: -0.01em;
 }
 
@@ -363,8 +359,7 @@
 .submit-button:hover:not(:disabled) {
   transform: translateY(-4px);
   /* Enhanced hover shadow */
-  box-shadow: 0 20px 48px rgba(102, 126, 234, 0.4), 0 12px 24px rgba(118, 75, 162, 0.25), 0 0 0 1px
-    rgba(255, 255, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: 0 20px 48px rgba(102, 126, 234, 0.4), 0 12px 24px rgba(118, 75, 162, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .submit-button:hover:not(:disabled)::before {
@@ -405,6 +400,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -433,6 +429,7 @@
     opacity: 0;
     transform: translateY(-16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -514,13 +511,13 @@
 }
 
 /* Enhanced accessibility features */
-.file-input:focus + .file-input-label {
-  outline: 3px solid #667eea;
+.file-input:focus+.file-input-label {
+  outline: 3px solid #3b82f6;
   outline-offset: 3px;
 }
 
 .submit-button:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #3b82f6;
   outline-offset: 3px;
 }
 

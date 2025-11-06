@@ -26,8 +26,24 @@ function Auth({ onLoginSuccess, onRegisterSuccess }) {
           email,
           password,
         });
-        if (error) throw error;
 
+        if (error) {
+          console.error("Login error:", error);
+          // Provide user-friendly error messages
+          if (error.message.includes("Invalid login credentials")) {
+            throw new Error(
+              "Invalid email or password. Please check your credentials and try again."
+            );
+          } else if (error.message.includes("Email not confirmed")) {
+            throw new Error(
+              "Please confirm your email address before logging in."
+            );
+          } else {
+            throw error;
+          }
+        }
+
+        console.log("Login successful:", data);
         onLoginSuccess && onLoginSuccess(data);
         navigate("/dashboard");
       } else {
@@ -40,7 +56,20 @@ function Auth({ onLoginSuccess, onRegisterSuccess }) {
             password,
           }
         );
-        if (authError) throw authError;
+
+        if (authError) {
+          console.error("Signup error:", authError);
+          throw authError;
+        }
+
+        console.log("Signup successful:", authData);
+
+        // Check if email confirmation is required
+        if (authData.user && !authData.session) {
+          throw new Error(
+            "Registration successful! Please check your email to confirm your account before logging in."
+          );
+        }
 
         const { error: dbError } = await supabase.from("user").insert([
           {
@@ -52,17 +81,22 @@ function Auth({ onLoginSuccess, onRegisterSuccess }) {
             current_company: status === "professional" ? currentCompany : null,
           },
         ]);
-        if (dbError) throw dbError;
 
-        // auto-login after registration
-        const { error: loginError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (loginError) throw loginError;
+        if (dbError) {
+          console.error("Database insert error:", dbError);
+          throw dbError;
+        }
 
-        onRegisterSuccess && onRegisterSuccess(authData);
-        navigate("/dashboard");
+        // auto-login after registration (only if email confirmation is not required)
+        if (authData.session) {
+          onRegisterSuccess && onRegisterSuccess(authData);
+          navigate("/dashboard");
+        } else {
+          setError(
+            "Registration successful! Please check your email to confirm your account."
+          );
+          setIsLogin(true); // Switch to login view
+        }
       }
     } catch (err) {
       setError(err.message);

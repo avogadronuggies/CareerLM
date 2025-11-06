@@ -8,3 +8,6 @@ python-dotenv
 pydantic
 psycopg2-binary
 supabase
+scikit-learn
+numpy
+pandas

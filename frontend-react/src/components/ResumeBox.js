@@ -100,7 +100,22 @@ function ResultBox({ result }) {
                     </div>
                   ) : (
                     <div className="no-items-compact success-message">
-                      <span>✓ No gaps identified - Great job!</span>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        style={{ display: "inline", marginRight: "6px" }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>No gaps identified - Great job!</span>
                     </div>
                   )}
                 </div>
@@ -141,7 +156,22 @@ function ResultBox({ result }) {
                     </div>
                   ) : (
                     <div className="no-items-compact success-message">
-                      <span>✓ Perfect alignment - No changes needed!</span>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        style={{ display: "inline", marginRight: "6px" }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>Perfect alignment - No changes needed!</span>
                     </div>
                   )}
                 </div>
