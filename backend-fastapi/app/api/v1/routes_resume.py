@@ -1,49 +1,26 @@
-import io
+"""
+Resume Routes Module
+
+This module defines the API endpoints for resume-related operations including
+optimization, skill gap analysis, and study materials generation.
+"""
+
 import json
-import pdfplumber
 from datetime import datetime
 from fastapi import APIRouter, UploadFile, File, Form
 from fastapi.responses import JSONResponse
+
+# Import centralized parser
+from app.services.resume_parser import ResumeParser, get_parser
+
+# Import service modules
 from app.services.resume_optimizer import optimize_resume_logic
 from app.services.skill_gap_analyzer import analyze_skill_gap
+
+# Import Supabase client
 from supabase_client import supabase
-import re
 
 router = APIRouter()
-
-def extract_text_from_pdf(file_bytes):
-    text = ""
-    with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text += page_text + "\n"
-    return text
-
-
-def parse_resume_sections(text: str):
-    """Parse resume into sections: experience, projects, skills, education"""
-    section_titles = ["Experience", "Projects", "Skills", "Education"]
-    pattern = r"(?i)\b(" + "|".join(section_titles) + r")\b"
-    splits = re.split(pattern, text)
-
-    sections, current_section = {}, None
-    for part in splits:
-        part = part.strip()
-        if not part:
-            continue
-
-        if part.lower() in [s.lower() for s in section_titles]:
-            current_section = part.lower()
-            sections[current_section] = ""
-        elif current_section:
-            sections[current_section] += ("\n" if sections[current_section] else "") + part
-
-    if "skills" in sections:
-        skills_list = re.split(r"[,\n;]+", sections["skills"])
-        sections["skills"] = [s.strip() for s in skills_list if s.strip()]
-
-    return sections
 
 
 @router.post("/optimize")
@@ -52,19 +29,39 @@ async def optimize_resume(
     resume: UploadFile = File(...),
     job_description: str = Form(...)
 ):
-    # 1️⃣ Extract raw text
-    resume_bytes = await resume.read()
-    resume_text = extract_text_from_pdf(resume_bytes)
-
-    # 2️⃣ Parse structured sections
-    sections = parse_resume_sections(resume_text)
-
-    # 3️⃣ Run optimizer logic
-    analysis_result = optimize_resume_logic(resume_bytes, job_description, filename=resume.filename)
+    """
+    Optimize a resume against a job description.
     
-    # 3.5️⃣ Run skill gap analysis
-    skill_gap_result = analyze_skill_gap(resume_bytes, filename=resume.filename)
+    This endpoint performs:
+    1. Text extraction from the resume PDF
+    2. Section parsing and analysis
+    3. Resume optimization suggestions via LLM
+    4. ATS scoring
+    5. Skill gap analysis
+    6. Persistence to Supabase
+    
+    Args:
+        user_id: The user's unique identifier.
+        resume: The uploaded resume file (PDF).
+        job_description: The target job description.
+        
+    Returns:
+        JSON response with optimization results, ATS score, and career analysis.
+    """
+    # 1️⃣ Read resume bytes once
+    resume_bytes = await resume.read()
+    
+    # 2️⃣ Use centralized parser to extract text and sections
+    parser = get_parser()
+    resume_text, sections = parser.parse_resume(resume_bytes, filename=resume.filename)
+    
+    # 3️⃣ Run optimizer logic with pre-parsed text and sections
+    analysis_result = optimize_resume_logic(resume_text, sections, job_description)
+    
+    # 4️⃣ Run skill gap analysis with pre-parsed text
+    skill_gap_result = analyze_skill_gap(resume_text, filename=resume.filename)
 
+    # 5️⃣ Build response object
     result = {
         "sections": sections,
         "analysis": {
@@ -86,8 +83,7 @@ async def optimize_resume(
         "filename": resume.filename,
     }
 
-
-    # 4️⃣ Insert/Update Supabase
+    # 6️⃣ Insert/Update Supabase
     existing_resume = supabase.table("resumes").select("*").eq("user_id", user_id).execute()
 
     if existing_resume.data:
@@ -113,7 +109,7 @@ async def optimize_resume(
     stored_version = supabase.table("resume_versions").insert({
         "resume_id": resume_id,
         "version_number": new_version_number,
-        "content": json.dumps(result),   # ✅ ensure JSONB compatibility
+        "content": json.dumps(result),
         "ats_score": result.get("ats_score"),
         "raw_file_path": result.get("filename"),
         "notes": ""
@@ -130,17 +126,25 @@ async def optimize_resume(
 async def skill_gap_analysis(resume: UploadFile = File(...)):
     """
     Analyze career matches based on skills clustering.
+    
     Returns probability-based career recommendations and skill gaps for each career.
+    
+    Args:
+        resume: The uploaded resume file (PDF).
+        
+    Returns:
+        JSON response with skill analysis and career recommendations.
     """
     try:
         # Read resume file
         resume_bytes = await resume.read()
         
-        # Import the new function
-        from app.services.skill_gap_analyzer import analyze_skill_gap
+        # Use centralized parser to extract text
+        parser = get_parser()
+        resume_text = parser.extract_text(resume_bytes, filename=resume.filename)
         
-        # Perform career clustering analysis
-        analysis_result = analyze_skill_gap(resume_bytes, filename=resume.filename)
+        # Perform career clustering analysis with pre-parsed text
+        analysis_result = analyze_skill_gap(resume_text, filename=resume.filename)
         
         # Check for errors
         if "error" in analysis_result:
@@ -183,6 +187,15 @@ async def generate_study_materials(
 ):
     """
     Generate personalized study materials and learning resources based on skill gaps.
+    
+    Args:
+        resume: The uploaded resume file (PDF).
+        job_description: The target job description.
+        target_career: Optional target career path.
+        missing_skills: Optional JSON string of missing skills.
+        
+    Returns:
+        JSON response with study materials and learning resources.
     """
     try:
         # Read resume file
@@ -192,7 +205,6 @@ async def generate_study_materials(
         from app.services.study_materials_generator import generate_learning_resources
         
         # Parse missing skills if provided
-        import json
         skills_list = json.loads(missing_skills) if missing_skills else []
         
         # Generate study materials

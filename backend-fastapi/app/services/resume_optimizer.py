@@ -1,6 +1,10 @@
-import re
-import pdfplumber
-import io
+"""
+Resume Optimizer Module
+
+This module provides functionality to analyze resumes against job descriptions,
+identifying gaps and providing alignment suggestions using LLM.
+"""
+
 import os
 from groq import Groq
 from dotenv import load_dotenv
@@ -11,40 +15,46 @@ load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
-def parse_resume_sections(resume_text):
-    sections = {"Experience": "", "Skills": "", "Projects": ""}
-    current = None
-    for line in resume_text.splitlines():
-        line = line.strip()
-        if re.match(r"experience", line, re.I):
-            current = "Experience"
-        elif re.match(r"skills?", line, re.I):
-            current = "Skills"
-        elif re.match(r"projects?", line, re.I):
-            current = "Projects"
-        elif current and line:
-            sections[current] += line + "\n"
-    return sections
-
-
-def create_prompt(sections, job_description):
+def create_prompt(sections: dict, job_description: str) -> str:
+    """
+    Create a prompt for the LLM to analyze resume gaps.
+    
+    Args:
+        sections: Dictionary of parsed resume sections.
+        job_description: The target job description.
+        
+    Returns:
+        Formatted prompt string.
+    """
+    experience = sections.get("experience", "").strip()
+    skills = sections.get("skills", "").strip()
+    projects = sections.get("projects", "").strip()
+    
     return (
-        f"Experience:\n{sections['Experience'].strip()}\n\n"
-        f"Skills:\n{sections['Skills'].strip()}\n\n"
-        f"Projects:\n{sections['Projects'].strip()}\n\n"
+        f"Experience:\n{experience}\n\n"
+        f"Skills:\n{skills}\n\n"
+        f"Projects:\n{projects}\n\n"
         f"Job description:\n{job_description.strip()}\n\n"
         "Return the following:\n"
         "1. What gaps are there in the resume compared to the job description? \n"
         "Don't overthink and just return the gaps you find.\n"
         "2. How can the candidate align their resume better to the job description?\n"
-        
     )
 
 
-def groq_response(prompt: str):
+def groq_response(prompt: str) -> dict:
+    """
+    Get optimization suggestions from Groq LLM.
+    
+    Args:
+        prompt: The formatted prompt to send to the LLM.
+        
+    Returns:
+        Dictionary containing gaps, suggestions, and the original prompt.
+    """
     try:
         completion = client.chat.completions.create(
-            model="llama-3.1-8b-instant",  # You can switch to "llama3-70b-8192" if needed
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": "You are a helpful career assistant."},
                 {"role": "user", "content": prompt},
@@ -53,7 +63,7 @@ def groq_response(prompt: str):
 
         text = completion.choices[0].message.content
 
-        # Extract structured info (like you were doing for Ollama)
+        # Extract structured info
         gaps, suggestions = [], []
         for line in text.splitlines():
             if line.strip().startswith("1."):
@@ -71,32 +81,29 @@ def groq_response(prompt: str):
         return {"error": str(e), "prompt": prompt}
 
 
-def extract_text_from_pdf(file_bytes):
-    text = ""
-    with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-        for page in pdf.pages:
-            text += page.extract_text() or ""
-    return text
-
-
-def optimize_resume_logic(resume_content, job_description, filename=None):
-    # PDF parsing
-    if filename and filename.lower().endswith('.pdf'):
-        resume_text = extract_text_from_pdf(resume_content)
-    else:
-        try:
-            resume_text = resume_content.decode("utf-8")
-        except Exception:
-            resume_text = str(resume_content)
-
-    sections = parse_resume_sections(resume_text)
-    prompt = create_prompt(sections, job_description)
+def optimize_resume_logic(resume_text: str, resume_sections: dict, job_description: str) -> dict:
+    """
+    Main function to optimize a resume against a job description.
+    
+    This function analyzes the resume content, identifies gaps compared to
+    the job description, and provides ATS scoring.
+    
+    Args:
+        resume_text: The extracted resume text.
+        resume_sections: The parsed resume sections dictionary.
+        job_description: The target job description.
+        
+    Returns:
+        Dictionary containing gaps, suggestions, ATS score, and analysis.
+    """
+    # Create prompt for LLM
+    prompt = create_prompt(resume_sections, job_description)
     
     # Get optimization suggestions from LLM
     result = groq_response(prompt)
     
     # Get ATS score and analysis
-    ats_analysis = get_ats_score(resume_content, job_description, filename)
+    ats_analysis = get_ats_score(resume_text, resume_sections, job_description)
     
     # Add ATS score to result
     result["ats_score"] = ats_analysis["overall_score"]
