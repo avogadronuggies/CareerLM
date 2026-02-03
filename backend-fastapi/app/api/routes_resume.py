@@ -1,3 +1,4 @@
+# app/routes/resume.py (or wherever your router is)
 import io
 import json
 import pdfplumber
@@ -52,6 +53,11 @@ async def optimize_resume(
     resume: UploadFile = File(...),
     job_description: str = Form(...)
 ):
+    """
+    🤖 AGENTIC Resume Optimization Endpoint
+    Uses LangGraph multi-agent system to analyze and optimize resumes
+    """
+    
     # 1️⃣ Extract raw text
     resume_bytes = await resume.read()
     resume_text = extract_text_from_pdf(resume_bytes)
@@ -59,35 +65,58 @@ async def optimize_resume(
     # 2️⃣ Parse structured sections
     sections = parse_resume_sections(resume_text)
 
-    # 3️⃣ Run optimizer logic
-    analysis_result = optimize_resume_logic(resume_bytes, job_description, filename=resume.filename)
+    # 3️⃣ Run AGENTIC optimizer logic (this now uses LangGraph!)
+    print(f"📄 Processing resume: {resume.filename}")
+    print(f"👤 User ID: {user_id}")
+    print(f"📋 Job Description length: {len(job_description)} chars")
     
-    # 3.5️⃣ Run skill gap analysis
-    skill_gap_result = analyze_skill_gap(resume_bytes, filename=resume.filename)
+    analysis_result = optimize_resume_logic(
+        resume_bytes, 
+        job_description, 
+        filename=resume.filename
+    )
+    
+    print(f"✅ Analysis complete! ATS Score: {analysis_result.get('ats_score')}/100")
+    print(f"🤖 Agent iterations: {analysis_result.get('total_iterations')}")
 
+    # 4️⃣ Build comprehensive result
     result = {
+        # Original fields (backward compatible)
         "sections": sections,
-        "analysis": {
-            "gaps": analysis_result.get("gaps", []),
-            "alignment_suggestions": analysis_result.get("alignment_suggestions", []),
-            "prompt": analysis_result.get("prompt", "")
-        },
+        "filename": resume.filename,
+        
+        # ATS Analysis
         "ats_score": analysis_result.get("ats_score"),
         "ats_analysis": analysis_result.get("ats_analysis", {}),
+        
+        # Optimization Suggestions
+        "analysis": {
+            "gaps": analysis_result.get("gaps", []),  # Skill gaps
+            "alignment_suggestions": analysis_result.get("alignment_suggestions", []),
+            "structure_suggestions": analysis_result.get("structure_suggestions", []),  # ✅ NEW - only if ATS < 60
+        },
+        
+        # Career Analysis (from agentic workflow)
         "careerAnalysis": {
-            "user_skills": skill_gap_result.get("user_skills", []),
-            "total_skills_found": skill_gap_result.get("total_skills_found", 0),
-            "career_matches": skill_gap_result.get("career_matches", []),
-            "top_3_careers": skill_gap_result.get("top_3_careers", []),
-            "ai_recommendations": skill_gap_result.get("ai_recommendations", ""),
-            "analysis_summary": skill_gap_result.get("analysis_summary", {})
-        } if "error" not in skill_gap_result else None,
-        "summary": "",
-        "filename": resume.filename,
+            "user_skills": analysis_result.get("user_skills", []),
+            "total_skills_found": len(analysis_result.get("user_skills", [])),
+            "career_matches": analysis_result.get("career_matches", []),
+            "top_3_careers": analysis_result.get("career_matches", [])[:3],
+        },
+        
+        # 🤖 Agentic Metadata (NEW - for debugging/UI)
+        "agentic_metadata": {
+            "agent_execution_log": analysis_result.get("agent_execution_log", []),
+            "total_iterations": analysis_result.get("total_iterations", 0),
+            "completed_steps": analysis_result.get("completed_steps", []),
+            "is_agentic": analysis_result.get("_agentic", False),
+            "version": analysis_result.get("_version", "1.0")
+        },
+        
+        "summary": "",  # Keep for backward compatibility
     }
 
-
-    # 4️⃣ Insert/Update Supabase
+    # 5️⃣ Insert/Update Supabase
     existing_resume = supabase.table("resumes").select("*").eq("user_id", user_id).execute()
 
     if existing_resume.data:
@@ -113,19 +142,21 @@ async def optimize_resume(
     stored_version = supabase.table("resume_versions").insert({
         "resume_id": resume_id,
         "version_number": new_version_number,
-        "content": json.dumps(result),   # ✅ ensure JSONB compatibility
+        "content": json.dumps(result),
         "ats_score": result.get("ats_score"),
         "raw_file_path": result.get("filename"),
-        "notes": ""
+        "notes": f"Agentic analysis v{result['agentic_metadata']['version']} - {result['agentic_metadata']['total_iterations']} iterations"
     }).execute()
 
     return JSONResponse({
+        "success": True,  # ✅ Add success flag
         "optimization": result,
         "resume_id": resume_id,
         "version_stored": stored_version.data
     })
 
 
+# Keep your other endpoints as-is
 @router.post("/skill-gap-analysis")
 async def skill_gap_analysis(resume: UploadFile = File(...)):
     """
@@ -133,16 +164,11 @@ async def skill_gap_analysis(resume: UploadFile = File(...)):
     Returns probability-based career recommendations and skill gaps for each career.
     """
     try:
-        # Read resume file
         resume_bytes = await resume.read()
-        
-        # Import the new function
         from app.services.skill_gap_analyzer import analyze_skill_gap
         
-        # Perform career clustering analysis
         analysis_result = analyze_skill_gap(resume_bytes, filename=resume.filename)
         
-        # Check for errors
         if "error" in analysis_result:
             return JSONResponse(
                 status_code=400,
@@ -185,17 +211,12 @@ async def generate_study_materials(
     Generate personalized study materials and learning resources based on skill gaps.
     """
     try:
-        # Read resume file
         resume_bytes = await resume.read()
-        
-        # Import the function
         from app.services.study_materials_generator import generate_learning_resources
         
-        # Parse missing skills if provided
         import json
         skills_list = json.loads(missing_skills) if missing_skills else []
         
-        # Generate study materials
         study_result = generate_learning_resources(
             resume_bytes,
             job_description,
